@@ -889,6 +889,14 @@ void AP_TECS::_update_throttle_without_airspeed(int16_t throttle_nudge)
         _throttle_dem = nomThr;
     }
 
+    if (_hgt_rate_dem > 0.0f && _climb_rate_limit > 0.0f) {
+        _throttle_dem = nomThr + (_THRmaxf - nomThr) * _hgt_rate_dem / _climb_rate_limit;
+    } else if (_hgt_rate_dem < 0.0f && _sink_rate_limit > 0.0f) {
+        _throttle_dem = nomThr + (_THRminf - nomThr) * -_hgt_rate_dem / _sink_rate_limit;
+    } else {
+        _throttle_dem = nomThr;
+    }
+
     if (_flight_stage == AP_FixedWing::FlightStage::TAKEOFF) {
         const uint32_t now = AP_HAL::millis();
         if (_takeoff_start_ms == 0) {
